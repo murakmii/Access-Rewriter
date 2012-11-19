@@ -10,24 +10,24 @@
     config: null
   };
 
-  main = function(config) {
+  main = function(config, data) {
     if (!global.app.setup_failed) {
-      global.app.config = new global.config(config.app);
+      global.app.config = new global.config(config.app, data);
     }
     return global.app.is_ready = true;
   };
 
   setup = function() {
     return chrome.storage.local.get(["version", "app"], function(config) {
-      var default_config, version;
+      var data, default_config, id, id_array, property, rewrite, version;
       if (chrome.runtime.lastError != null) {
         global.app.setup_failed = true;
-        main(null);
+        main();
         return;
       }
       version = chrome.runtime.getManifest().version;
       if ((config.version != null) && config.version !== version) {
-        return main(null);
+        return main();
       } else if (!(config.version != null)) {
         default_config = {
           version: version,
@@ -38,10 +38,40 @@
         };
         return chrome.storage.local.set(default_config, function() {
           global.app.setup_failed = chrome.runtime.lastError != null;
-          return main(global.app.setup_failed ? null : default_config);
+          return main((global.app.setup_failed ? null : default_config), {});
         });
       } else {
-        return main(config);
+        id_array = (function() {
+          var _i, _len, _ref, _results;
+          _ref = config.app.rewrite;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            rewrite = _ref[_i];
+            _results.push(rewrite.id);
+          }
+          return _results;
+        })();
+        data = {};
+        if (id_array.length === 0) {
+          return main(config, data);
+        } else {
+          id = id_array.shift();
+          property = "data_" + id;
+          return chrome.storage.local.get(property, function(got) {
+            if (chrome.runtime.lastError != null) {
+              global.app.setup_failed = true;
+              return main();
+            } else {
+              data[property] = got[property];
+              if ((id = id_array.shift()) != null) {
+                property = "data_" + id;
+                return chrome.storage.local.get(property, arguments.callee);
+              } else {
+                return main(config, data);
+              }
+            }
+          });
+        }
       }
     });
   };
@@ -52,7 +82,7 @@
     if (rewrite.base64) {
       data += ";base64";
     }
-    data += "," + rewrite.data;
+    data += "," + global.app.config.get_data(rewrite.id);
     return data;
   };
 

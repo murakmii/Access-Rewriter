@@ -5,45 +5,63 @@ global.app =
    setup_failed   : false
    config         : null
 
-main = ( config ) ->
+main = ( config, data ) ->
    if not global.app.setup_failed
-      global.app.config = new global.config config.app
+      global.app.config = new global.config config.app, data
 
    global.app.is_ready = true
 
-# 設定のセットアップを行う
-# 途中でエラーが発生した場合はglobal.app.setup_failedをtrueに設定する
-# 処理の終了後、設定データを引数にmainを呼び出す。global.app.setup_filedがtrueに設定されている場合は引数はnullとなる
 setup = ( ) ->
    chrome.storage.local.get [ "version", "app" ], ( config ) ->
 
       if chrome.runtime.lastError?
          global.app.setup_failed = true
-         main( null )
+         main( )
          return
 
       version = chrome.runtime.getManifest( ).version
+
+      # 設定データに書き込まれているバージョンが違う場合
       if config.version? and config.version isnt version
+         main( )
 
-         # ここにバージョン間の設定の差異を補完するコード
-         main( null )
-
+      # 設定データが見つからない場合
       else if not config.version?
          default_config = 
-            version: version
-            app:
+            version  : version
+            app      :
                disabled_all   : false
                rewrite        : [ ]
          chrome.storage.local.set default_config, ( ) ->
             global.app.setup_failed = chrome.runtime.lastError?
-            main( if global.app.setup_failed then null else default_config )
+            main ( if global.app.setup_failed then null else default_config ), { }
+
+      # 設定データが存在する場合
       else
-         main( config )
+         id_array = ( rewrite.id for rewrite in config.app.rewrite )
+         data     = { }
+         if id_array.length is 0
+            main config, data
+         else
+            id = id_array.shift( )
+            property = "data_#{id}"
+            chrome.storage.local.get property, ( got ) ->
+               if chrome.runtime.lastError?
+                  global.app.setup_failed = true
+                  main( )
+               else
+                  data[ property ] = got[ property ]
+                  if ( id = id_array.shift( ) )?
+                     property = "data_#{id}"
+                     chrome.storage.local.get property, arguments.callee
+                  else
+                     main config, data
+
 
 create_data_url_scheme = ( rewrite ) ->
    data = "data:#{rewrite.mime_header}/#{rewrite.mime_body}"
    if rewrite.base64 then data += ";base64"
-   data += ",#{rewrite.data}"
+   data += "," + global.app.config.get_data rewrite.id
    data
 
 chrome.runtime.onInstalled.addListener setup

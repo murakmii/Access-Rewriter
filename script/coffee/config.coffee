@@ -17,18 +17,17 @@ class config
          return i if rewrite.id is id
       -1
 
-   constructor: ( @_config ) ->
+   constructor: ( @_config, @_data ) ->
 
    # データを除いた設定を返す
    get_rewrite: ( id ) -> @_get_rewrite id
    get_rewrites: ( ) -> @_config.rewrite
 
-   read_data: ( id, callback ) ->
-      chrome.storage.local.get "data_#{id}", ( got ) =>
-         if chrome.runtime.lastError?
-            callback.call @, false, null
-         else
-            callback.call @, true, got[ "data_#{id}" ]
+   get_data: ( id ) ->
+      if @_data[ "data_#{id}" ]?
+         @_data[ "data_#{id}" ]
+      else
+         null
 
    add: ( title, url, url_is_regex, mime_header, mime_body, base64, data, callback ) ->
 
@@ -45,14 +44,17 @@ class config
          mime_header : mime_header,
          mime_body   : mime_body
          base64      : base64
-         data        : data
          disabled    : false
 
-      chrome.storage.local.set app: @_config, ( ) =>
+      set_data = app: @_config
+      set_data[ "data_#{id}" ] = data # データは個別のプロパティへ格納する
+
+      chrome.storage.local.set set_data, ( ) =>
          if chrome.runtime.lastError?
             @_config.rewrite.pop( )
             callback.call @, false, null
          else
+            @_data[ "data_#{id}" ] = data
             callback.call @, true, @_config.rewrite[ @_config.rewrite.length - 1 ]
 
    remove: ( id, callback ) ->
@@ -66,7 +68,12 @@ class config
             @_config.rewrite.splice index, 0, removed
             callback.call @, false, null
          else
-            callback.call @, true, removed
+            # データに関してはエラーチェックをしない
+            # なので失敗した場合は"迷子のデータ"が発生する
+            # 迷子のデータを削除する機能が必要になるかも
+            chrome.storage.local.remove "data_#{removed.id}", ( ) =>
+               @_data[ "data_#{removed.id}" ] = undefined
+               callback.call @, true, removed
 
    override: ( id, title, url, url_is_regex, mime_header, mime_body, base64, data, callback ) ->
       callback.call @, false, null if ( index = @_get_rewrite_index parseInt ( id ) ) is -1
@@ -80,14 +87,17 @@ class config
          mime_header : mime_header
          mime_body   : mime_body
          base64      : base64
-         data        : data
          disabled    : backup.disabled
 
-      chrome.storage.local.set app: @_config, ( ) =>
+      set_data = app: @_config
+      set_data[ "data_#{backup.id}" ] = data
+
+      chrome.storage.local.set set_data, ( ) =>
          if chrome.runtime.lastError?
             @_config.rewrite[ index ] = backup
             callback.call @, false, null
          else
+            @_data[ "data_#{backup.id}" ] = data
             callback.call @, true, @_config.rewrite[ index ]
 
    disabled_all: ( ) -> @_config.disabled_all
@@ -109,7 +119,6 @@ class config
             callback.call @, false, @_config.rewrite[ index ]
          else
             callback.call @, true, @_config.rewrite[ index ]
-
 
 global.config = config
 

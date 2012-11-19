@@ -91,7 +91,7 @@
     document.rewrite.mime_header.value = rewrite.mime_header;
     document.rewrite.mime_body.value = rewrite.mime_body;
     $('input[ type = "radio" ][ name = "type" ]').val([rewrite.base64 ? 'binary' : 'text']);
-    return document.rewrite.data.value = rewrite.data;
+    return document.rewrite.data.value = global.app.config.get_data(rewrite.id);
   };
 
   clicked_rewrite_remove = function() {

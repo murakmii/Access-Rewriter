@@ -36,8 +36,9 @@
       return -1;
     };
 
-    function config(_config) {
+    function config(_config, _data) {
       this._config = _config;
+      this._data = _data;
     }
 
     config.prototype.get_rewrite = function(id) {
@@ -48,19 +49,16 @@
       return this._config.rewrite;
     };
 
-    config.prototype.read_data = function(id, callback) {
-      var _this = this;
-      return chrome.storage.local.get("data_" + id, function(got) {
-        if (chrome.runtime.lastError != null) {
-          return callback.call(_this, false, null);
-        } else {
-          return callback.call(_this, true, got["data_" + id]);
-        }
-      });
+    config.prototype.get_data = function(id) {
+      if (this._data["data_" + id] != null) {
+        return this._data["data_" + id];
+      } else {
+        return null;
+      }
     };
 
     config.prototype.add = function(title, url, url_is_regex, mime_header, mime_body, base64, data, callback) {
-      var id, valid_mime,
+      var id, set_data, valid_mime,
         _this = this;
       valid_mime = /^[a-zA-Z\.\-]+$/;
       if (!mime_header.match(valid_mime || !mime_body.match(valid_mime))) {
@@ -75,16 +73,18 @@
         mime_header: mime_header,
         mime_body: mime_body,
         base64: base64,
-        data: data,
         disabled: false
       });
-      return chrome.storage.local.set({
+      set_data = {
         app: this._config
-      }, function() {
+      };
+      set_data["data_" + id] = data;
+      return chrome.storage.local.set(set_data, function() {
         if (chrome.runtime.lastError != null) {
           _this._config.rewrite.pop();
           return callback.call(_this, false, null);
         } else {
+          _this._data["data_" + id] = data;
           return callback.call(_this, true, _this._config.rewrite[_this._config.rewrite.length - 1]);
         }
       });
@@ -105,13 +105,16 @@
           _this._config.rewrite.splice(index, 0, removed);
           return callback.call(_this, false, null);
         } else {
-          return callback.call(_this, true, removed);
+          return chrome.storage.local.remove("data_" + removed.id, function() {
+            _this._data["data_" + removed.id] = void 0;
+            return callback.call(_this, true, removed);
+          });
         }
       });
     };
 
     config.prototype.override = function(id, title, url, url_is_regex, mime_header, mime_body, base64, data, callback) {
-      var backup, index,
+      var backup, index, set_data,
         _this = this;
       if ((index = this._get_rewrite_index(parseInt(id))) === -1) {
         callback.call(this, false, null);
@@ -125,16 +128,18 @@
         mime_header: mime_header,
         mime_body: mime_body,
         base64: base64,
-        data: data,
         disabled: backup.disabled
       };
-      return chrome.storage.local.set({
+      set_data = {
         app: this._config
-      }, function() {
+      };
+      set_data["data_" + backup.id] = data;
+      return chrome.storage.local.set(set_data, function() {
         if (chrome.runtime.lastError != null) {
           _this._config.rewrite[index] = backup;
           return callback.call(_this, false, null);
         } else {
+          _this._data["data_" + backup.id] = data;
           return callback.call(_this, true, _this._config.rewrite[index]);
         }
       });

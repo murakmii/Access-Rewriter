@@ -70,7 +70,7 @@ clicked_rewrite_amend = ( ) ->
    document.rewrite.mime_header.value = rewrite.mime_header
    document.rewrite.mime_body.value = rewrite.mime_body
    $( 'input[ type = "radio" ][ name = "type" ]' ).val [ if rewrite.base64 then 'binary' else 'text' ]
-   document.rewrite.data.value = rewrite.data
+   document.rewrite.data.value = global.app.config.get_data rewrite.id
 
 clicked_rewrite_remove = ( ) ->
    if confirm( "本当に削除しますか？" )
