@@ -209,7 +209,20 @@ div#edit {
    }
 }
 
-
+div#about {
+   color: #888;
+   line-height: 2;
+   a {
+      text-decoration: none;
+      color: #BBB;
+      &:hover {
+         color: #666;
+      }
+   }
+   ul {
+      padding: 0 20px;
+   }
+}
 
 
 
