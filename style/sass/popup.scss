@@ -1,0 +1,86 @@
+
+$body_height: 400px;
+$h1_font_size: 17px;
+$h1_padding: 10px;
+
+@mixin selected_button( $border, $bkg ) {
+   border: solid 1px $border;
+   background-color: $bkg;
+   box-shadow: none;
+   color: white;
+   cursor: default;
+}
+
+* {
+   margin: 0;
+   padding: 0;
+}
+
+body {
+   width: 300px;
+   height: 400px;
+   border: solid 1px #777;
+   background-color: #EEE;
+}
+
+h1 {
+   color: #CCC;
+   font-size: $h1_font_size;
+   line-height: 1;
+   padding: $h1_padding;
+   background: -webkit-gradient( linear, left top, left bottom, from( #737373 ), to( #262626 ) );
+   text-shadow: -1px -1px 2px #222, 1px 1px 1px #444;
+}
+
+div#container {
+   width: 100%;
+   height: $body_height - $h1_font_size - $h1_padding * 2;
+   overflow-y: scroll;
+}
+
+form {
+   padding: 5px 5px 10px 5px;
+   padding: 7x 4px 4px 4px;
+   font-size: 13px;
+   line-height: 1;
+}
+
+div.rewrite {
+   font-size: 13px;
+   line-height: 1;
+   padding: 6px 0;
+   display: -webkit-box;
+   div.name {
+      width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      padding-top: 5px;
+      padding-left: 5px;
+   }
+   div.button {
+      color: #666;
+      width: 30px;
+      text-align: center;
+      padding: 4px;
+      margin: 0 3px;
+      border-radius: 5px;
+      border: solid 1px #888;
+      background-color: #AAA;
+      box-shadow: inset 1px 1px 3px #777;
+      &:not( .selected ):hover {
+         color: #EEE;
+         text-shadow: 0 0 2px #EEE;
+         cursor: pointer;
+      }
+      &.on.selected {
+         @include selected_button( #75DA6D, #90E68A );
+      }
+      &.off.selected {
+         @include selected_button( #E26A6A, #F98484 );
+      }
+   }
+}
+
+
+
