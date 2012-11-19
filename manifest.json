@@ -2,12 +2,16 @@
 	"name": "Access Rewriter",
 	"version": "0.1",
 	"manifest_version": 2,
-
+	"options_page": "html/option.html",
 	"background": {
-		"scripts": [ "script/js/background.js" ]
+		"scripts": [ 
+			"script/js/config.js",
+			"script/js/background.js"
+		]
 	},
-	
 	"permissions": [
+		"storage",
+		"unlimitedStorage",
 		"webRequest",
 		"webRequestBlocking",
 		"*://*/*"

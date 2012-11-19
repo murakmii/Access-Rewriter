@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8" />
+      <link rel="stylesheet" type="text/css" href="/style/css/option.css" />
+      <script type="text/javascript" src="/script/js/jquery-1.8.3.js"></script>
+      <script type="text/javascript" src="/script/js/option.js"></script>
+   </head>
+   <body>
+      <div id="foreground-view">
+         <h3></h3>
+      </div>
+
+      <h1>Access Rewriter - 設定</h1>
+      <div id="tabs">
+         <div class="tab selected" data-panel="rewrite">書き換え設定</div>
+         <div class="tab" data-panel="about">この拡張について</div>
+      </div>
+
+      <div class="panel" id="rewrite">
+         <p class="introduction">
+            書き換え設定が設定されている対象URL(正規表現可)へのアクセスがあると、ブラウザは実際にはそのURLへアクセスせずここで設定されたデータ(テキスト,バイナリ)を返します。<br />
+            返すデータは手動で入力するか、ファイルから設定することもできます。手動でテキストとしてデータを入力する場合、文字コードはUTF-8となります。
+         </p>
+         <div class="column-container">
+            <div id="rewrite-column">
+               <p>設定されている書き換え設定:</p>
+               <div id="rewrite-list">
+               </div>
+            </div>
+            <div id="edit">
+               <h2>新規作成</h2>
+               <form name="rewrite">
+                  <input type="hidden" name="id" value="" />
+                  <table cellspacing="0">
+                     <tbody>
+                        <tr>
+                           <td class="label">タイトル:</td>
+                           <td><input type="text" name="title" /></td>
+                        </tr>
+                        <tr>
+                           <td class="label">対象URL:</td>
+                           <td>
+                              <input type="text" name="url" />&nbsp;
+                              <input type="checkbox" name="url_is_regex" id="label-url-is-regex" />
+                              <label for="label-url-is-regex">正規表現として扱う</label></td>
+                        </tr>
+                        <tr>
+                           <td class="label">ファイル読み込み:</td>
+                           <td>
+                              <div id="file-drop-area">必要な場合はここにドロップ</div>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td class="label">MIMEタイプ:</td>
+                           <td>
+                              <input type="text" name="mime_header" />&nbsp;/&nbsp;<input type="text" name="mime_body" />
+                           </td>
+                        </tr>
+                        <tr>
+                           <td class="label">データ種別:</td>
+                           <td>
+                              <input type="radio" id="label-text" name="type" value="text" checked />&nbsp;
+                              <label for="label-text">テキスト</label>&nbsp;
+                              <input type="radio" id="label-binary" name="type" value="binary" />&nbsp;
+                              <label for="label-binary">バイナリ(BASE64)</label>
+                           </td>
+                        </tr>
+                        <tr>
+                           <td class="label" style="vertical-align: top;">データ:</td>
+                           <td><textarea name="data"></textarea></td>
+                        </tr>
+                        <tr>
+                           <td colspan="2">
+                              <span id="status-message" class=""></span>
+                              <button type="button" name="cancel">キャンセル</button>
+                              <button type="button" name="save">保存</button>
+                           </td>
+                        </tr>
+                     </tbody>
+                  </table>
+               </form>
+            </div>
+         </div>
+      </div>
+
+      <div class="panel" id="about" style="display: none;">
+         仮設
+      </div>
+
+   </body>
+</html>
