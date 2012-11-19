@@ -53,7 +53,7 @@ chrome.webRequest.onBeforeRequest.addListener ( detail ) ->
 
    if global.app.is_ready and not global.app.setup_failed and not global.app.config.disabled_all( )
       for rewrite in global.app.config.get_rewrites( )
-         if not rewrite.disable
+         if not rewrite.disabled
             if rewrite.url_is_regex
                url_pattern = new RegExp rewrite.url
                return redirectUrl: create_data_url_scheme( rewrite ) if detail.url.match url_pattern

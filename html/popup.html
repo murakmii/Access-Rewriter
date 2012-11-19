@@ -7,72 +7,15 @@
       <script type="text/javascript" src="/script/js/popup.js"></script>
    </head>
    <body>
+      <div id="foreground-view"><h3></h3></div>
       <h1>Access Rewriter</h1>
       <div id="container">
          <form name="disabled_all">
             <input type="checkbox" name="checkbox" id="label-checkbox" />
             <label for="label-checkbox">全て無効</label>
          </form>
-         <div class="rewrite">
-            <div class="name">サンプル</div>
-            <div class="button on selected">ON</div>
-            <div class="button off selected">OFF</div>
-         </div>
-         <div class="rewrite">
-            <div class="name">サンプル</div>
-            <div class="button on selected">ON</div>
-            <div class="button off selected">OFF</div>
-         </div>  
-         <div class="rewrite">
-            <div class="name">サンプル</div>
-            <div class="button on selected">ON</div>
-            <div class="button off selected">OFF</div>
-         </div>   
-         <div class="rewrite">
-            <div class="name">サンプル</div>
-            <div class="button on selected">ON</div>
-            <div class="button off selected">OFF</div>
-         </div>
-         <div class="rewrite">
-            <div class="name">サンプル</div>
-            <div class="button on selected">ON</div>
-            <div class="button off selected">OFF</div>
-         </div>  
-         <div class="rewrite">
-            <div class="name">サンプル</div>
-            <div class="button on selected">ON</div>
-            <div class="button off selected">OFF</div>
-         </div>   
-         <div class="rewrite">
-            <div class="name">サンプル</div>
-            <div class="button on selected">ON</div>
-            <div class="button off selected">OFF</div>
-         </div>
-         <div class="rewrite">
-            <div class="name">サンプル</div>
-            <div class="button on selected">ON</div>
-            <div class="button off selected">OFF</div>
-         </div>  
-         <div class="rewrite">
-            <div class="name">サンプル</div>
-            <div class="button on selected">ON</div>
-            <div class="button off selected">OFF</div>
-         </div>   
-         <div class="rewrite">
-            <div class="name">サンプル</div>
-            <div class="button on selected">ON</div>
-            <div class="button off selected">OFF</div>
-         </div>
-         <div class="rewrite">
-            <div class="name">サンプル</div>
-            <div class="button on selected">ON</div>
-            <div class="button off selected">OFF</div>
-         </div>  
-         <div class="rewrite">
-            <div class="name">サンプル</div>
-            <div class="button on selected">ON</div>
-            <div class="button off selected">OFF</div>
-         </div>   
+         <div id="rewrites"></div>
+         <p id="disabled-all-message" style="display: none;">現在全ての設定が無効です</p>
       </div>
    </body>
 </html>

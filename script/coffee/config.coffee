@@ -93,11 +93,23 @@ class config
    disabled_all: ( ) -> @_config.disabled_all
    set_disabled_all: ( boolean, callback ) ->
       @_config.disabled_all = boolean
-      chrome.storage.local.set app: @_config, ( ) ->
+      chrome.storage.local.set app: @_config, ( ) =>
          if chrome.runtime.lastError?
             callback.call @, false
          else
             callback.call @, true
+
+   disabled: ( id, boolean, callback ) ->
+      if ( index = @_get_rewrite_index id ) is null then callback.call @, false, null
+      backup = @_config.rewrite[ index ].disabled
+      @_config.rewrite[ index ].disabled = boolean
+      chrome.storage.local.set app: @_config, ( ) =>
+         if chrome.runtime.lastError?
+            @_config.rewrite[ index ].disabled = backup
+            callback.call @, false, @_config.rewrite[ index ]
+         else
+            callback.call @, true, @_config.rewrite[ index ]
+
 
 global.config = config
 

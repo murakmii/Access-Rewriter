@@ -1,5 +1,6 @@
 {
 	"name": "Access Rewriter",
+	"description": "あるURLへのアクセスのレスポンスを任意のデータで置き換える拡張です。",
 	"version": "0.1",
 	"manifest_version": 2,
 	"icons": {

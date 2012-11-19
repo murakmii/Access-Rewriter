@@ -145,14 +145,35 @@
     };
 
     config.prototype.set_disabled_all = function(boolean, callback) {
+      var _this = this;
       this._config.disabled_all = boolean;
       return chrome.storage.local.set({
         app: this._config
       }, function() {
         if (chrome.runtime.lastError != null) {
-          return callback.call(this, false);
+          return callback.call(_this, false);
         } else {
-          return callback.call(this, true);
+          return callback.call(_this, true);
+        }
+      });
+    };
+
+    config.prototype.disabled = function(id, boolean, callback) {
+      var backup, index,
+        _this = this;
+      if ((index = this._get_rewrite_index(id)) === null) {
+        callback.call(this, false, null);
+      }
+      backup = this._config.rewrite[index].disabled;
+      this._config.rewrite[index].disabled = boolean;
+      return chrome.storage.local.set({
+        app: this._config
+      }, function() {
+        if (chrome.runtime.lastError != null) {
+          _this._config.rewrite[index].disabled = backup;
+          return callback.call(_this, false, _this._config.rewrite[index]);
+        } else {
+          return callback.call(_this, true, _this._config.rewrite[index]);
         }
       });
     };

@@ -66,7 +66,7 @@
       _ref = global.app.config.get_rewrites();
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         rewrite = _ref[_i];
-        if (!rewrite.disable) {
+        if (!rewrite.disabled) {
           if (rewrite.url_is_regex) {
             url_pattern = new RegExp(rewrite.url);
             if (detail.url.match(url_pattern)) {
