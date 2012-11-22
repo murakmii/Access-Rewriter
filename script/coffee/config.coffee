@@ -17,8 +17,51 @@ class config
          return i if rewrite.id is id
       -1
 
-   constructor: ( @_config, @_data ) ->
+   _write_config: ( callback ) ->
+      chrome.storage.local.set
+         version  : @_version
+         app      : @_config
+      , ( ) => callback.call @, not chrome.runtime.lastError?
 
+   _read_data: ( callback ) ->
+      if @_config.rewrite.length is 0
+         callback.call @, true
+      else
+         id_array = ( rewrite.id for rewrite in @_config.rewrite )
+         id       = id_array.shift( )
+         property = "data_#{id}"
+         chrome.storage.local.get property, ( data ) =>
+            if chrome.runtime.lastError?
+               callback.call @, false
+            else
+               @_data[ property ] = data[ property ]
+               if ( id = id_array.shift( ) )?
+                  property = "data_#{id}"
+                  chrome.storage.local.get property, arguments.callee
+               else
+                  callback.call @, true
+
+   constructor: ( callback ) ->
+
+      @_version   = chrome.runtime.getManifest( ).version
+      @_data      = { }
+      @_config    = 
+         disabled_all   : false
+         rewrite        : [ ]
+
+      chrome.storage.local.get [ "version", "app" ], ( saved ) =>
+         if chrome.runtime.lastError?
+            callback.call @, false
+         else 
+            if not saved.version?
+               @_write_config callback
+            else if saved.version isnt @_version
+               # バージョン情報が現在のバージョンと違う場合の処理をここに書く
+               # 現在無し
+            else
+               @_config = saved.app
+               @_read_data callback
+               
    # データを除いた設定を返す
    get_rewrite: ( id ) -> @_get_rewrite id
    get_rewrites: ( ) -> @_config.rewrite

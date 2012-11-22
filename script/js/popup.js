@@ -89,7 +89,7 @@
         return timer = setInterval(function() {
           if (global.app.is_ready) {
             clearInterval(timer);
-            return ready;
+            return ready();
           }
         }, 100);
       }

@@ -78,5 +78,5 @@ $ ( ) ->
          timer = setInterval ( ) ->
             if global.app.is_ready
                clearInterval timer
-               ready
+               ready( )
          , 100

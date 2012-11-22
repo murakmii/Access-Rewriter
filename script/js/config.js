@@ -36,9 +36,72 @@
       return -1;
     };
 
-    function config(_config, _data) {
-      this._config = _config;
-      this._data = _data;
+    config.prototype._write_config = function(callback) {
+      var _this = this;
+      return chrome.storage.local.set({
+        version: this._version,
+        app: this._config
+      }, function() {
+        return callback.call(_this, !(chrome.runtime.lastError != null));
+      });
+    };
+
+    config.prototype._read_data = function(callback) {
+      var id, id_array, property, rewrite,
+        _this = this;
+      if (this._config.rewrite.length === 0) {
+        return callback.call(this, true);
+      } else {
+        id_array = (function() {
+          var _i, _len, _ref, _results;
+          _ref = this._config.rewrite;
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            rewrite = _ref[_i];
+            _results.push(rewrite.id);
+          }
+          return _results;
+        }).call(this);
+        id = id_array.shift();
+        property = "data_" + id;
+        return chrome.storage.local.get(property, function(data) {
+          if (chrome.runtime.lastError != null) {
+            return callback.call(_this, false);
+          } else {
+            _this._data[property] = data[property];
+            if ((id = id_array.shift()) != null) {
+              property = "data_" + id;
+              return chrome.storage.local.get(property, arguments.callee);
+            } else {
+              return callback.call(_this, true);
+            }
+          }
+        });
+      }
+    };
+
+    function config(callback) {
+      var _this = this;
+      this._version = chrome.runtime.getManifest().version;
+      this._data = {};
+      this._config = {
+        disabled_all: false,
+        rewrite: []
+      };
+      chrome.storage.local.get(["version", "app"], function(saved) {
+        if (chrome.runtime.lastError != null) {
+          return callback.call(_this, false);
+        } else {
+          if (!(saved.version != null)) {
+            return _this._write_config(callback);
+          } else if (saved.version !== _this._version) {
+
+          } else {
+            _this._config = saved.app;
+            return _this._read_data(callback);
+          }
+        }
+      });
     }
 
     config.prototype.get_rewrite = function(id) {
